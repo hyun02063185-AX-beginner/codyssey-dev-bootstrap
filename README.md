@@ -22,6 +22,7 @@ chmod +x bootstrap.sh verify.sh update.sh cleanup.sh scripts/*.sh
 - Codex CLI (`npm install -g @openai/codex`)
 - Claude Code (`~/.local/bin`)
 - `~/.zshrc`의 Codyssey PATH 관리 블록
+- zsh inline autosuggestions (`~/.zsh/zsh-autosuggestions`) 및 기본 Tab completion
 - VS Code 확장 `anthropic.claude-code`, `openai.chatgpt`
 
 필수 시스템 도구가 없다면 원인을 표시하고, 설치 가능한 나머지 단계는 계속 시도합니다. 새 터미널을 열면 `.zshrc` 설정이 자동으로 적용됩니다.
@@ -42,6 +43,14 @@ git pull
 ```
 
 스크립트는 재실행해도 이미 맞는 도구를 건너뛰고, `.zshrc` 관리 블록을 중복 추가하지 않습니다. Node의 목표 major 버전은 [`versions.env`](versions.env)에서 관리합니다.
+
+### zsh 입력 보조
+
+새 zsh 터미널에서는 입력 중 이전 명령이나 completion 기반 제안이 회색 글씨로 보입니다.
+
+- `→` 키로 제안을 수락합니다.
+- `Tab`은 기존 zsh completion을 그대로 사용합니다.
+- 플러그인은 `~/.zsh/zsh-autosuggestions`에 GitHub clone으로만 설치하며, Homebrew·sudo는 사용하지 않습니다.
 
 `bootstrap.sh`는 설치와 복구만 담당하며 이미 설치된 Codex/Claude Code를 **업데이트하지 않습니다**. 복구 중 예상치 못한 breaking change를 피하기 위한 의도적인 정책입니다.
 

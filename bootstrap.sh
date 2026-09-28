@@ -42,6 +42,8 @@ else
   ok "Added Codyssey PATH block to $zshrc"
 fi
 
+run_step "zsh autosuggestions" "$SCRIPT_DIR/scripts/setup-zsh-autosuggestions.sh"
+
 run_step "VS Code extensions" "$SCRIPT_DIR/scripts/setup-vscode.sh"
 
 print -- "\n--- Verification ---"

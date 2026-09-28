@@ -65,6 +65,23 @@ path_contains "$VOLTA_HOME/bin" && report "Volta bin" "$VOLTA_HOME/bin" "OK" || 
 path_contains "$HOME/.local/bin" && report "Local bin" "$HOME/.local/bin" "OK" || report "Local bin" "$HOME/.local/bin" "MISSING"
 
 print -- ""
+print -- "Shell UX"
+autosuggestions_file="$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+if [[ ! -r "$autosuggestions_file" ]]; then
+  report "zsh autosuggestions" "missing at $autosuggestions_file" "MISSING"
+elif zsh -ic 'typeset -f _zsh_autosuggest_start >/dev/null 2>&1' >/dev/null 2>&1; then
+  report "zsh autosuggestions" "$autosuggestions_file" "OK"
+else
+  report "zsh autosuggestions" "installed at $autosuggestions_file but not loaded" "MISSING"
+fi
+
+if zsh -ic 'typeset -f compinit >/dev/null 2>&1 && typeset -f _main_complete >/dev/null 2>&1' >/dev/null 2>&1; then
+  report "zsh completion" "compinit + _main_complete" "OK"
+else
+  report "zsh completion" "compinit is not initialized in a new zsh session" "MISSING"
+fi
+
+print -- ""
 print -- "VS Code Extensions"
 if command -v code >/dev/null 2>&1; then
   extensions="$(code --list-extensions 2>/dev/null)"
