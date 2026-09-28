@@ -80,6 +80,24 @@ else
 fi
 
 print -- ""
+print -- "Desktop Apps (optional)"
+for app in ChatGPT Claude Discord; do
+  app_path=""
+  for app_dir in "$HOME/Applications" /Applications; do
+    if [[ -d "$app_dir/$app.app" ]]; then
+      app_path="$app_dir/$app.app"
+      break
+    fi
+  done
+  # Optional: a missing app is reported but never counted as a failure.
+  if [[ -n "$app_path" ]]; then
+    printf '  %-18s %-28s [%s]\n' "$app" "$app_path" "OK"
+  else
+    printf '  %-18s %-28s [%s]\n' "$app" "not installed" "OPTIONAL"
+  fi
+done
+
+print -- ""
 if (( status_failures == 0 )); then
   ok "Environment verification passed."
   exit 0
