@@ -1,0 +1,22 @@
+# Secrets and local authentication state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.token
+*.secret
+credentials/
+secrets/
+.auth/
+.tokens/
+
+# Tool and editor state
+.codex/
+.claude/
+.vscode/settings.json
+
+# OS and package-manager noise
+.DS_Store
+node_modules/
+npm-debug.log*
