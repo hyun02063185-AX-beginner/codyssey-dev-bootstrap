@@ -66,6 +66,43 @@ git pull
 
 > 참고: Claude Code 네이티브 설치본은 기본적으로 자체 자동 업데이트를 수행할 수 있습니다. 이 저장소는 자동 업데이트를 제어하지 않으며, 필요하면 향후 설정 방법을 검토할 수 있습니다.
 
+## AWS EC2 SSH 개인키 복구 및 사용
+
+코디세이 교육장 공용 Mac에서 EC2에 SSH로 접속할 때는 개인키를 이 Git 저장소가 아닌 별도 개인 저장소에서 복구해 사용합니다. 현재 사용자는 개인 Google Drive에 SSH 키를 별도로 보관하고 있습니다.
+
+- EC2 개인키(`.pem`, `id_rsa`, `id_ed25519` 등)는 Git 저장소에 절대 커밋하지 않습니다.
+- private Git 저장소라도 개인키 보관용으로 사용하지 않습니다.
+- 실제 개인키는 개인 Google Drive 등 별도 개인 저장소에 보관합니다.
+- API key, SSH private key, credential 등 민감정보는 README나 Git에 기록하지 않습니다.
+
+개인 Google Drive에서 키 파일을 내려받은 뒤, 교육장 Mac의 `~/.ssh` 아래로 옮깁니다. Google Drive나 다운로드를 거치면 Unix permission이 유지되지 않을 수 있으므로, 사용 전에 권한을 다시 설정합니다.
+
+```bash
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+mv ~/Downloads/b3-1-ec2-key.pem ~/.ssh/
+chmod 400 ~/.ssh/b3-1-ec2-key.pem
+```
+
+SSH 접속 예시는 다음과 같습니다. 실제 EC2 IP 주소, AWS 계정 정보, 개인키 내용은 문서에 넣지 않습니다.
+
+```bash
+ssh -i ~/.ssh/b3-1-ec2-key.pem ec2-user@<EC2_PUBLIC_IP>
+```
+
+공용 PC 사용을 마치기 전에는 개인키가 `~/.ssh`에 남아 있는지 확인합니다.
+
+```bash
+ls -la ~/.ssh
+```
+
+필요하면 로컬에 복사한 키를 삭제합니다.
+
+```bash
+rm ~/.ssh/b3-1-ec2-key.pem
+```
+
 ## 정리 안내
 
 ```bash
