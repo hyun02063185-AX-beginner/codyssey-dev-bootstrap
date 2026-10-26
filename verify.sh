@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="${0:A:h}"
 source "$SCRIPT_DIR/scripts/common.sh"
+source "$SCRIPT_DIR/scripts/apps-common.sh"
 
 status_failures=0
 report() {
@@ -97,22 +98,26 @@ else
 fi
 
 print -- ""
-print -- "Desktop Apps (optional)"
+# Standalone: every app is optional. setup.sh sets CODYSSEY_REQUIRED_APPS to the
+# apps it installs, so a missing or unverified one becomes a failure there.
+required_apps=(${=CODYSSEY_REQUIRED_APPS:-})
+print -- "Desktop Apps"
 for app in ChatGPT Claude Discord; do
-  app_path=""
-  for app_dir in "$HOME/Applications" /Applications; do
-    if [[ -d "$app_dir/$app.app" ]]; then
-      app_path="$app_dir/$app.app"
-      break
+  if app_path="$(find_app "$app")"; then
+    if app_check "$app_path" "$app"; then
+      report "$app" "$REPLY  $app_path" "OK"
+    elif (( ${required_apps[(Ie)$app]} )); then
+      report "$app" "$app_path: $REPLY" "FAIL"
+    else
+      printf '  %-18s %-28s [%s]\n' "$app" "$app_path: $REPLY" "WARN"
     fi
-  done
-  # Optional: a missing app is reported but never counted as a failure.
-  if [[ -n "$app_path" ]]; then
-    printf '  %-18s %-28s [%s]\n' "$app" "$app_path" "OK"
+  elif (( ${required_apps[(Ie)$app]} )); then
+    report "$app" "not installed" "FAIL"
   else
-    printf '  %-18s %-28s [%s]\n' "$app" "not installed" "OPTIONAL"
+    printf '  %-18s %-28s [%s]\n' "$app" "not installed: ${APP_DOWNLOAD_PAGE[$app]}" "OPTIONAL / MANUAL"
   fi
 done
+print -- "  (bundle, signature and Gatekeeper checked; GUI launch and sign-in are not verified)"
 
 print -- ""
 if (( status_failures == 0 )); then

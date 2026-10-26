@@ -6,6 +6,9 @@ source "$SCRIPT_DIR/scripts/common.sh"
 print -- "=== Codyssey Dev Bootstrap ==="
 print -- "This script only uses your home directory. It never uses sudo or Homebrew."
 
+# setup.sh runs the system check and verification itself; skip them here then.
+from_setup="${CODYSSEY_FROM_SETUP:-}"
+
 failures=0
 run_step() {
   local label="$1"
@@ -18,7 +21,7 @@ run_step() {
   ((failures++))
 }
 
-run_step "System checks" "$SCRIPT_DIR/scripts/system-check.sh"
+[[ -n "$from_setup" ]] || run_step "System checks" "$SCRIPT_DIR/scripts/system-check.sh"
 run_step "Volta" "$SCRIPT_DIR/scripts/install-volta.sh"
 run_step "Node.js" "$SCRIPT_DIR/scripts/install-node.sh"
 run_step "Codex CLI" "$SCRIPT_DIR/scripts/install-codex.sh"
@@ -46,11 +49,9 @@ run_step "zsh autosuggestions" "$SCRIPT_DIR/scripts/setup-zsh-autosuggestions.sh
 
 run_step "VS Code extensions" "$SCRIPT_DIR/scripts/setup-vscode.sh"
 
-print -- "\n--- Verification ---"
-if "$SCRIPT_DIR/verify.sh"; then
-  :
-else
-  ((failures++))
+if [[ -z "$from_setup" ]]; then
+  print -- "\n--- Verification ---"
+  "$SCRIPT_DIR/verify.sh" || ((failures++))
 fi
 
 if (( failures == 0 )); then

@@ -47,6 +47,7 @@ temporary="$(mktemp "${TMPDIR:-/tmp}/codyssey-zshrc.XXXXXX")" || {
 
 inside_block=0
 legacy_migrated=0
+last_line=""
 while IFS= read -r line || [[ -n "$line" ]]; do
   if [[ "$line" == "$start_marker" ]]; then
     inside_block=1
@@ -65,6 +66,7 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     continue
   fi
   print -r -- "$line" >> "$temporary"
+  last_line="$line"
 done < "$zshrc"
 
 if (( inside_block )); then
@@ -74,7 +76,8 @@ if (( inside_block )); then
 fi
 
 {
-  print -- ""
+  # Re-running must not add another blank separator line each time.
+  [[ -n "$last_line" ]] && print -- ""
   print -- "$start_marker"
   print -- 'autoload -Uz compaudit'
   print -- 'insecure_completion_paths=("${(@f)$(compaudit 2>/dev/null)}")'
