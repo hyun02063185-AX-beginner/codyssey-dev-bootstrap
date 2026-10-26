@@ -73,9 +73,13 @@ print -- "Next steps (manual)"
 for item in $manual; do
   print -r -- "  - $item"
 done
+if command -v gh >/dev/null 2>&1 && ! gh auth status --hostname github.com >/dev/null 2>&1; then
+  print -- "  - GitHub: gh auth login --web   (then gh auth setup-git if it was not run)"
+fi
 print -- "  - Sign in yourself to GitHub, Codex, Claude Code, Claude, Discord (and ChatGPT)."
 print -- "  - Approve macOS permission prompts (notifications, accessibility, ...) when apps ask."
 print -- "  - Open a new terminal so ~/.zshrc changes take effect."
+print -- "  - Before leaving a shared Mac: ./cleanup.sh (includes gh auth logout)."
 
 print -- ""
 rule

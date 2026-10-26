@@ -26,6 +26,7 @@ run_step "Volta" "$SCRIPT_DIR/scripts/install-volta.sh"
 run_step "Node.js" "$SCRIPT_DIR/scripts/install-node.sh"
 run_step "Codex CLI" "$SCRIPT_DIR/scripts/install-codex.sh"
 run_step "Claude Code" "$SCRIPT_DIR/scripts/install-claude.sh"
+run_step "GitHub CLI" "$SCRIPT_DIR/scripts/install-gh.sh"
 
 print -- "\n--- zsh configuration ---"
 zshrc="$HOME/.zshrc"
@@ -48,6 +49,10 @@ fi
 run_step "zsh autosuggestions" "$SCRIPT_DIR/scripts/setup-zsh-autosuggestions.sh"
 
 run_step "VS Code extensions" "$SCRIPT_DIR/scripts/setup-vscode.sh"
+
+# Sign-in is optional and never counted as a failure.
+print -- "\n--- GitHub sign-in ---"
+"$SCRIPT_DIR/scripts/setup-gh-auth.sh"
 
 if [[ -z "$from_setup" ]]; then
   print -- "\n--- Verification ---"

@@ -30,6 +30,7 @@ chmod +x setup.sh setup-apps.sh bootstrap.sh verify.sh update.sh cleanup.sh scri
 - Volta (`~/.volta`) 및 Node.js 24
 - Codex CLI (`npm install -g @openai/codex`)
 - Claude Code (`~/.local/bin`)
+- GitHub CLI `gh` (`~/.local/share/gh`, `~/.local/bin/gh`): 공식 릴리스(github.com/cli/cli)의 macOS zip을 받아 SHA-256 체크섬과 GitHub 서명(Team ID `VEKTX9H2N7`)을 확인한 뒤 설치
 - `~/.zshrc`의 Codyssey PATH 관리 블록
 - zsh inline autosuggestions (`~/.zsh/zsh-autosuggestions`) 및 기본 Tab completion
 - VS Code 확장 `anthropic.claude-code`, `openai.chatgpt`
@@ -68,6 +69,20 @@ ChatGPT는 자체 설치 프로그램(`ChatGPTInstaller.dmg` 안의 `Install Cha
 2. DMG를 열고 설치 프로그램 안내를 따릅니다. 설치 위치를 고를 수 있으면 관리자 권한이 필요 없는 `~/Applications`(홈 폴더의 응용 프로그램)를 선택합니다.
 3. 관리자 암호를 요구하면 설치를 취소하고 교육장 담당자에게 문의합니다.
 4. `./verify.sh`로 `ChatGPT [OK]`인지 확인합니다.
+
+### GitHub CLI 로그인
+
+`gh`가 로그인되어 있지 않으면 `setup.sh`가 브라우저 로그인을 할지 묻습니다(`y`일 때만 실행).
+
+```bash
+gh auth login --hostname github.com --web --git-protocol https   # 직접 실행할 때
+gh auth setup-git                                                # git HTTPS push에 gh 인증 사용
+```
+
+- 로그인 후 `gh auth setup-git`으로 `https://github.com`에 대해서만 git이 gh 인증을 쓰도록 설정합니다. 이미 github.com용 다른 credential helper가 있으면 바꾸지 않고, 전역 `credential.helper`도 건드리지 않습니다.
+- 토큰은 gh가 macOS 키체인에 저장합니다. 이 저장소, 로그, `.zshrc`에는 토큰·비밀번호·개인키를 저장하지 않습니다.
+- 로그인을 건너뛰거나 실패해도 개발환경 설치 실패로 처리하지 않습니다. `verify.sh`는 `gh` 설치(필수)와 로그인 상태(선택)를 따로 보고합니다.
+- `gh`로 이슈·PR 생성 등 GitHub API 쓰기 작업을 할 때 HTTP 403이 나오면 설치 문제가 아니라, 계정이나 토큰이 해당 저장소·조직에 쓰기 권한이 없거나 조직이 앱 접근을 승인하지 않은 경우일 수 있습니다. 저장소/조직 권한을 확인하세요. 이 저장소는 권한을 변경하지 않습니다.
 
 ### 로그인과 권한
 
@@ -170,7 +185,13 @@ rm ~/.ssh/b3-1-ec2-key.pem
 ./cleanup.sh
 ```
 
-v0.1의 cleanup은 의도적으로 파일을 삭제하지 않습니다. 공용 Mac에서 Git, Codex, Claude, 브라우저, VS Code의 로그인 세션을 직접 확인하도록 안내합니다. API 키·토큰·비밀번호·쿠키·인증 파일은 저장소에 커밋하지 마세요.
+공용 Mac 사용을 마칠 때는 GitHub CLI에서도 로그아웃합니다. 키체인에 저장된 gh 토큰이 삭제됩니다.
+
+```bash
+gh auth logout --hostname github.com
+```
+
+v0.1의 cleanup은 의도적으로 파일을 삭제하지 않습니다. 공용 Mac에서 Git·GitHub CLI, Codex, Claude, 브라우저, VS Code의 로그인 세션을 직접 확인하도록 안내합니다. API 키·토큰·비밀번호·쿠키·인증 파일은 저장소에 커밋하지 마세요.
 
 ## 범위와 향후 계획
 

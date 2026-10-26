@@ -45,7 +45,7 @@ done
 
 print -- ""
 print -- "AI"
-for entry in 'Codex:codex:--version' 'Claude:claude:--version'; do
+for entry in 'Codex:codex:--version' 'Claude:claude:--version' 'GitHub CLI:gh:--version'; do
   parts=(${(s/:/)entry})
   value="$(version_or_missing "$parts[2]" "$parts[3]")"
   [[ "$value" == "not found" ]] && result="MISSING" || result="OK"
@@ -54,7 +54,7 @@ done
 
 print -- ""
 print -- "Executables"
-for executable in volta node npm codex claude; do
+for executable in volta node npm codex claude gh; do
   executable_path="$(command -v "$executable" 2>/dev/null || print -- 'not found')"
   [[ "$executable_path" == "not found" ]] && result="MISSING" || result="OK"
   report "$executable" "$executable_path" "$result"
@@ -81,6 +81,25 @@ if zsh -ic 'typeset -f compinit >/dev/null 2>&1 && typeset -f _main_complete >/d
 else
   report "zsh completion" "compinit is not initialized in a new zsh session" "MISSING"
 fi
+
+print -- ""
+# Sign-in state is reported but never counted as a failure.
+print -- "GitHub (sign-in optional)"
+if ! command -v gh >/dev/null 2>&1; then
+  printf '  %-18s %-28s [%s]\n' "gh auth" "GitHub CLI not installed" "MANUAL"
+elif gh auth status --hostname github.com >/dev/null 2>&1; then
+  account="$(gh auth status --hostname github.com 2>/dev/null | sed -n 's/.*Logged in to github.com account \([^ ]*\).*/\1/p' | head -n 1)"
+  printf '  %-18s %-28s [%s]\n' "gh auth" "signed in as $account" "OK"
+  if git config --global --get-all credential.https://github.com.helper 2>/dev/null | grep -q 'gh auth git-credential'; then
+    printf '  %-18s %-28s [%s]\n' "git HTTPS auth" "via gh (gh auth setup-git)" "OK"
+  else
+    printf '  %-18s %-28s [%s]\n' "git HTTPS auth" "not using gh; run: gh auth setup-git" "WARN"
+  fi
+else
+  printf '  %-18s %-28s [%s]\n' "gh auth" "not signed in; run: gh auth login --web" "MANUAL"
+fi
+print -- "  (an HTTP 403 on GitHub API writes usually means the account or token lacks"
+print -- "   access to that repository or organization, not a broken install)"
 
 print -- ""
 print -- "VS Code Extensions"
